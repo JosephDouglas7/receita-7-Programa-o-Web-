@@ -1,121 +1,102 @@
+//Feito as correções de erro com a ajudo do: https://copilot.microsoft.com/
+
 <!DOCTYPE html>
+<html lang="pt-BR">
 
-<html>   
-
-   <head>
-      <meta charset="UTF-8">      
-      <style>
-         /* Estilo geral do corpo */
-         body {
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Fundo gradiente */
-            font-family: 'Roboto', Arial, sans-serif; /* Fonte moderna */
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo de Tabela Genérica</title>
+    <script type="module" src="./tableGenerator.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
             margin: 0;
             padding: 0;
-         }
+        }
 
-         /* Estilo para o div onde as informações serão carregadas */
-         #itemsDiv {
+        #dataDiv {
             margin-top: 20px;
             text-align: center;
-            font-family: 'Roboto', Arial, sans-serif;
-         }
+        }
 
-         /* Estilo para os contêineres dos itens */
-         .item {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin: 15px auto;
-            width: 60%;
-            text-align: left;
-            background-color: #fff; /* Fundo branco para contraste */
-            border-radius: 10px; /* Bordas arredondadas */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombras suaves */
-            transition: transform 0.2s, box-shadow 0.2s;
-         }
-
-         .item:hover {
-            transform: scale(1.03); /* Efeito de zoom */
-            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2); /* Sombras mais evidentes */
-         }
-
-         .item h3 {
-            margin-bottom: 8px;
-            color: #4CAF50;
-            font-size: 20px;
-         }
-
-         .item p {
-            margin: 5px 0;
-            font-size: 16px;
-         }
-
-         /* Estilo para o botão */
-         button {
+        button {
             background-color: #4CAF50;
             color: white;
-            border: none;
-            padding: 12px 25px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 18px;
-            font-family: 'Roboto', Arial, sans-serif;
-            border-radius: 10px; /* Bordas arredondadas */
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-         }
+            transition: background-color 0.3s ease;
+        }
 
-         button:hover {
-            background-color: #45a049; /* Cor mais clara ao passar o mouse */
-            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15); /* Sombras mais profundas */
-         }
-      </style>
-      <!-- Fonte do Google Fonts -->
-      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-   </head>
+        button:hover {
+            background-color: #45a049;
+        }
 
-   <body>
-      <div style="text-align: center; margin-top: 30px;">
-         <h1 style="color: #4CAF50;">Bem-vindo ao Mundo das Comidas!</h1>
-         <p style="color: #333; font-size: 18px;">Clique no botão abaixo para explorar comidas deliciosas.</p>
-      </div>
-      <div style="text-align: center;"><button id="botaoCarregar">Carregando comidas...</button></div>
-      <div id="itemsDiv"></div>
-   </body>   
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+            width: 80%;
+            text-align: center;
+        }
 
-   <script>
-      let comidas = [];
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
 
-      // Função para carregar as informações das comidas
-      const carregarDiv = cs => {
-         const div = document.getElementById("itemsDiv");
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
 
-         // Gera HTML para cada comida com propriedades relevantes
-         const itensHtml = cs.map(comida => `
-            <div class="item">
-               <h3>${comida.dish || "Nome desconhecido"}</h3>
-               <p><strong>Descrição:</strong> ${comida.description || "Informação indisponível"}</p>
-               <p><strong>Ingrediente Principal:</strong> ${comida.ingredient || "Informação indisponível"}</p>
-               <p><strong>Categoria:</strong> ${comida.category || "Informação indisponível"}</p>
-               <p><strong>Preço:</strong> ${comida.price || "Informação indisponível"}</p>
-            </div>
-         `);
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
 
-         div.innerHTML = `${itensHtml.join("")}`;
-      };
+<body>
+    <h1 style="text-align: center; color: #4CAF50;">Tabela de Endereços Aleatórios</h1>
+    <div style="text-align: center;">
+        <button id="loadData">Carregar Dados</button>
+    </div>
+    <div id="dataDiv"></div>
+</body>
 
-      // Função para buscar as comidas da API
-      async function carregarComidas() {  
-         try {
-            let res = await fetch("https://random-data-api.com/api/food/random_food?size=3");
-            comidas = await res.json();
-            carregarDiv(comidas);
-         } catch (err) { 
-            document.getElementById("itemsDiv").innerHTML = "<p style='color: red;'>Erro ao carregar as comidas. Tente novamente mais tarde.</p>";
-         }
-      }
+<script type="module">
+    import { generateTable } from './tableGenerator.js'; // Importa a função genérica
 
-      // Adiciona evento ao botão para carregar as comidas
-      let botao = document.getElementById("botaoCarregar");
-      botao.addEventListener("click", () => carregarComidas());
-   </script>
+    // Função para buscar dados da API e montar a tabela
+    async function fetchData() {
+        const dataDiv = document.getElementById("dataDiv");
+
+        try {
+            const response = await fetch("https://random-data-api.com/api/address/random_address?size=5");
+
+            // Verifica se a resposta foi bem-sucedida
+            if (!response.ok) {
+                throw new Error("Erro ao acessar os dados da API.");
+            }
+
+            const data = await response.json();
+
+            // Configura os cabeçalhos e propriedades
+            const headers = ["Rua", "Cidade", "Estado", "País", "CEP"];
+            const properties = ["street_name", "city", "state", "country", "zip_code"];
+
+            // Gera a tabela usando a função genérica
+            generateTable(data, headers, properties, "dataDiv");
+        } catch (error) {
+            console.error("Erro ao carregar os dados:", error);
+            dataDiv.innerHTML = "<p style='color: red;'>Erro ao carregar os dados. Verifique sua conexão e tente novamente.</p>";
+        }
+    }
+
+    // Adiciona evento de clique no botão
+    document.getElementById("loadData").addEventListener("click", fetchData);
+</script>
 
 </html>
